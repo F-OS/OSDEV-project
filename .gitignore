@@ -1,3 +1,6 @@
-build
-iso
-limine
+limine/**
+
+*.o
+*.a
+*.img
+*.log

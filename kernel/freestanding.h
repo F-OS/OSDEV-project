@@ -1,0 +1,6 @@
+#include "freestanding-headers/stdint.h"
+#include "freestanding-headers/stdnoreturn.h"
+#include "freestanding-headers/stdbool.h"
+#include "freestanding-headers/stddef.h"
+#include "freestanding-headers/stdalign.h"
+#include "freestanding-headers/limits.h"
