@@ -33,4 +33,5 @@ SECTIONS
         *(.bss .bss.*)
         *(COMMON)
     } :data
+    
 }

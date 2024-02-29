@@ -3,8 +3,6 @@
 	url = https://github.com/limine-bootloader/limine.git
 	branch = v5.x-branch-binary
 
-[submodule "freestanding-headers"]
+[submodule "common/freestanding-headers"]
 	path = common/freestanding-headers
 	url = https://github.com/mintsuki/freestanding-headers.git
-	branch = master
-

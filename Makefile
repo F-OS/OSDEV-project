@@ -26,11 +26,11 @@ QEMUFLAGS+=-drive file=$(DISK),format=raw
 
 #QEMU Flags
 QEMUMEM=256M
-QEMUCPU=host
+QEMUCPU=max
 QEMUSMP=1
 QEMUFLAGS+=-m $(QEMUMEM) -smp $(QEMUSMP) -serial stdio -cpu $(QEMUCPU)
 # Enable KVM and other hardware acceleration to speed up the emulation
-QEMUFLAGS+=-enable-kvm -machine q35 -device intel-iommu -device intel-hda -device hda-duplex
+QEMUFLAGS+= -machine q35 -device intel-iommu -device intel-hda -device hda-duplex
 # Debugging
 QEMUFLAGS+=-d int -D qemu.log
 QEMUFLAGS+=-no-reboot -no-shutdown
@@ -49,7 +49,8 @@ LIBC_OBJ=$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(patsubst %.s,%.o,$(LIBC_SRC))
 USER_DIR=user
 USER_TOOLS=$(shell find $(USER_DIR) -type d -not -name 'user' -exec basename {} \;)
 
-all: kernel.bin $(USER_TOOLS) $(LIBC_DIR)/libc.a
+
+all: kernel.bin $(USER_TOOLS) $(LIBC_DIR)/libc.a limine/bin/limine-bios.sys limine/bin/limine-bios-hdd.bin
 	#Detach any loopback devices
 	sudo kpartx -d $(DISK) || true
 	sudo losetup -D || true
@@ -75,8 +76,6 @@ all: kernel.bin $(USER_TOOLS) $(LIBC_DIR)/libc.a
 	done
 	# Copy the libc to the disk image
 	sudo cp $(LIBC_DIR)/libc.a mnt
-	# Install limine
-	(cd limine && make > /dev/null 2>&1)
 	sudo cp limine.cfg limine/bin/limine-bios.sys limine/bin/limine-bios-hdd.bin mnt
 	# Unmount the disk image
 	sudo umount mnt
@@ -103,6 +102,7 @@ $(LIBC_DIR)/libc.a: $(LIBC_OBJ)
 %.o: %.asm
 	$(AS) $(ASFLAGS) -o $@ $<
 
+
 $(USER_TOOLS): $(LIBC_DIR)/libc.a
 	$(MAKE) -C $(USER_DIR)/$@
 
@@ -117,3 +117,13 @@ clean:
 	sudo losetup -D || true
 	sudo rm -f $(DISK)
 	sudo rm -rf mnt
+
+limine/bin/limine-bios.sys limine/bin/limine-bios-hdd.bin:
+	git submodule update --init --recursive
+	(cd limine && git checkout trunk > /dev/null 2>&1)
+	(cd limine && ./bootstrap > /dev/null 2>&1)
+	(cd limine && ./configure --enable-bios > /dev/null 2>&1)
+	(cd limine && make -j16 > /dev/null 2>&1)
+	[ -f limine/bin/limine-bios.sys ] || (echo "limine/bin/limine-bios.sys not found" && exit 1)
+	[ -f limine/bin/limine-bios-hdd.bin ] || (echo "limine/bin/limine-bios-hdd.bin not found" && exit 1)
+	[ -f limine.cfg ] || (echo "limine.cfg not found" && exit 1)

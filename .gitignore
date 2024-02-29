@@ -1,4 +1,5 @@
-limine/**
+limine/**/*
+limine/*
 
 *.o
 *.a
