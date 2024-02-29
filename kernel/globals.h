@@ -4,5 +4,6 @@
 #define MB * 1024 KB
 #define GB * 1024 MB
 #define KERNEL_STACK_SIZE 16 MB
+#define NULL ((void *)0)
 
 #endif

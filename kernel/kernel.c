@@ -1,47 +1,27 @@
 // definitions, that are always nice to have
 
 // limine definitions
-#include "limine/limine.h"
-#include "limine/motionlimine.h"
-#include "support/font/font.h"
+#include "display/fb.h"
+#include "early/limine.h"
+#include "early/motionlimine.h"
 #include <stdlib.h>
-
-int sqrt(int x) {
-  int res = 0;
-  int add = 1 << 30;
-  while (add > x) {
-    add >>= 2;
-  }
-  while (add) {
-    if (x >= res + add) {
-      x -= res + add;
-      res = (res >> 1) + add;
-    } else {
-      res >>= 1;
-    }
-    add >>= 2;
-  }
-  return res;
-}
+#define MS *1000
 
 void kernel(void) {
-  limine_init(); // Recieve data from limine
-  if (lim_fb == NULL || lim_fb->framebuffer_count != 1) {
-    return;
+  limine_init();
+  // linear framebuffer is available (with 32 bits per pixel)
+  if (fb_init() != 0) {
+    for (;;)
+      ;
   }
-  init_fb(lim_fb->framebuffers[0]);
-  fb_idx = 2;
-  for (int i = 0; i < 24; i++) {
-    for (int j = 0; j < 24; j++) {
-      putPixel(j, i, 0x00000000);
-    }
-  }
-  drawString(0, 0, "Hello, World!", 0xFFFFFFFF, 0x00000000);
-  for (int i = 0; i < 1024; i++)
-  {
-    for (int j = 0; j < 768; j++)
-    {
-      putPixel(i, j, (i << 16) | (j << 8) | (i + j));
+  fb_clear(0x77777777);
+  int x = 48;
+  int y = 0;
+  for (int i = 0; i < 132; i++) {
+    x += fb_draw_glyph(x, y, 0x00FF00FF, i);
+    if (x > fb_width - 48) {
+      x = 0;
+      y += 8;
     }
   }
   quick_blit(1, 0);

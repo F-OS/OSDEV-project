@@ -5,3 +5,4 @@ limine/*
 *.a
 *.img
 *.log
+*.bin
