@@ -1,6 +1,6 @@
 #include "fb.h"
-#include "../early/limine.h"
-#include "../early/motionlimine.h"
+#include "../limine/limine.h"
+#include "../limine/motionlimine.h"
 #include "../globals.h"
 #include "font.h"
 
@@ -32,7 +32,7 @@ void fb_draw_pixel(int x, int y, uint32_t color) {
   fb[y * fb_width + x] = color;
 }
 
-int fb_draw_glyph(int x, int y, uint32_t color, char c) {
+int fb_draw_glyph(int x, int y, uint32_t fg, uint32_t bg, char c) {
   if (x < 0 || x >= fb_width || y < 0 || y >= fb_height) {
     return 0;
   }
@@ -40,8 +40,11 @@ int fb_draw_glyph(int x, int y, uint32_t color, char c) {
   unsigned char *glyph = number_font[idx];
   for (int i = 0; i < FONT_HEIGHT; i++) {
     for (int j = 0; j < FONT_WIDTH; j++) {
-      if (glyph[i] & (1 << (j))) {
-        fb_draw_pixel(x + j, y + i, color);
+      if (glyph[i] & (1 << (FONT_WIDTH - 1 - j))) {
+        fb_draw_pixel(x + j, y + i, fg);
+      }
+      else {
+        fb_draw_pixel(x + j, y + i, bg);
       }
     }
   }

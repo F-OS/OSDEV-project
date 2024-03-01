@@ -5,7 +5,7 @@
  * Terminal palette
  */
 typedef unsigned int uint32_t;
-#define C_BLACK 0
+#define C_DARK_GREY 0
 #define C_RED 1
 #define C_GREEN 2
 #define C_BROWN 3
@@ -21,11 +21,12 @@ typedef unsigned int uint32_t;
 #define C_MAGENTA 13
 #define C_CYAN 14
 #define C_WHITE 15
+#define C_BLACK 16
 
 
 // Terminal palette
 const uint32_t term_colors[256] = {
-	/* black  */ 0x2e3436,
+	/* grey   */ 0x2e3436,
 	/* red    */ 0xcc0000,
 	/* green  */ 0x3e9a06,
 	/* brown  */ 0xc4a000,
@@ -41,7 +42,7 @@ const uint32_t term_colors[256] = {
 	/* magenta*/ 0xad7fa8,
 	/* cyan   */ 0x34e2e2,
 	/* white  */ 0xFFFFFF,
-				 0x000000,
+	/* black  */ 0x010101,
 				 0x00005f,
 				 0x000087,
 				 0x0000af,

@@ -1,30 +1,34 @@
 // definitions, that are always nice to have
 
 // limine definitions
+#include "display/console.h"
 #include "display/fb.h"
-#include "early/limine.h"
-#include "early/motionlimine.h"
-#include <stdlib.h>
-#define MS *1000
-
+#include "limine/limine.h"
+#include "limine/motionlimine.h"
+void print_memory_map(void);
 void kernel(void) {
   limine_init();
-  // linear framebuffer is available (with 32 bits per pixel)
+  // Check for video
   if (fb_init() != 0) {
     for (;;)
       ;
   }
-  fb_clear(0x77777777);
-  int x = 48;
-  int y = 0;
-  for (int i = 0; i < 132; i++) {
-    x += fb_draw_glyph(x, y, 0x00FF00FF, i);
-    if (x > fb_width - 48) {
-      x = 0;
-      y += 8;
-    }
+  // Clear the screen
+  fb_clear(0x00000000);
+  //const char *hello = "Hello, World!";
+  // Draw the string
+  console_init();
+  console_puts("Kernel started\n");
+  console_puts("Memory map:\n");
+  print_memory_map();
+}
+
+void print_memory_map(void) {
+  for(unsigned i = 0; i < lim_memmap->entry_count; i++)
+  {
+    struct limine_memmap_entry *entry = lim_memmap->entries[i];
+
+    console_puts("Base: ");
+    console_puthex(entry->base);
   }
-  quick_blit(1, 0);
-  for (;;)
-    ;
 }
